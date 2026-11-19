@@ -16,33 +16,50 @@ Desafio 2 da disciplina Desenvolvimento de Sistemas Móveis (ADS, SENAI/SC).
 | JDK | 21 |
 | Emulador | Android 16 (API 36), imagem **Google Play** x86_64 |
 
-A imagem do emulador precisa ser a **Google Play**: a ação de traçar rota usa o `geocoding` (serviços do Google no aparelho) e abre o Google Maps.
+Uso o emulador com a imagem **Google Play** porque a ação de traçar rota vai precisar do `geocoding` (que no Android depende dos serviços do Google) e de um app de mapas instalado. Isso será confirmado quando a rota for implementada.
 
 Só o Android foi testado. A pasta `ios/` faz parte do projeto, como o enunciado pede, mas compilar para iOS exige macOS e Xcode.
 
 ## Como executar
 
+### 1. Preparar o ambiente (uma vez)
+
+1. Instale o [Flutter](https://docs.flutter.dev/get-started/install) e o [Android Studio](https://developer.android.com/studio).
+2. No Windows, ative o **Modo de Desenvolvedor** (Configurações → Sistema → Para desenvolvedores). Sem ele, o `flutter pub get` não instala os plugins.
+3. Aceite as licenças do Android e confira o ambiente:
+   ```bash
+   flutter doctor --android-licenses
+   flutter doctor
+   ```
+   A linha "Android toolchain" precisa aparecer com ✓.
+4. Instale o **NDK 28.2.13676358**. No primeiro build o Gradle tenta instalar sozinho, mas com o Android SDK Command-line Tools mais recente essa instalação automática falha. Pelo Android Studio: SDK Manager → aba SDK Tools → NDK (Side by side). Pelo terminal, eu usei:
+   ```bash
+   android sdk install ndk/28.2.13676358
+   ```
+5. Crie um emulador: Android Studio → Device Manager → Create device → um Pixel com a imagem **Android 16 (API 36) Google Play**.
+
+### 2. Rodar o app
+
+Com o emulador ligado:
+
 ```bash
 git clone https://github.com/lucascagostinho/senai-desafio-desenvolvimento-de-sistemas-moveis.git
 cd senai-desafio-desenvolvimento-de-sistemas-moveis
 flutter pub get
+flutter devices   # o emulador precisa aparecer na lista
 flutter run
 ```
 
-Com o emulador aberto (ou um celular Android conectado), o `flutter run` instala e abre o app.
-
-Para rodar os testes e a análise estática:
+### 3. Testes e análise
 
 ```bash
 flutter test
 flutter analyze
 ```
 
-### Problemas que encontrei ao preparar o ambiente (Windows)
+### Observação sobre o build no Windows
 
-- **NDK não instalado pelo Gradle.** No primeiro build, o Gradle tenta instalar o NDK 28.2 sozinho e falha com o Android SDK Command-line Tools mais recente. Instale antes: `android sdk install ndk/28.2.13676358` (ou pelo SDK Manager do Android Studio, aba SDK Tools).
-- **Modo de Desenvolvedor do Windows** precisa estar ativo para o `flutter pub get` instalar os plugins.
-- **Projeto e cache de pacotes em discos diferentes** (ex.: projeto no `D:`, cache no `C:`) quebram a compilação incremental do Kotlin. Por isso o `android/gradle.properties` tem `kotlin.incremental=false`.
+Com o projeto e o cache de pacotes do Flutter em discos diferentes (no meu caso, projeto no `D:` e cache no `C:`), a compilação incremental do Kotlin falha. Por isso o `android/gradle.properties` tem `kotlin.incremental=false`.
 
 ## Bibliotecas
 
@@ -65,9 +82,11 @@ O enunciado (passo 02) indica as bibliotecas e as versões mínimas. O `^` aceit
 | build_runner *(dev)* | ^2.0.5 | 2.4.13 | Roda os geradores de código |
 | hive_generator *(dev)* | ^2.0.0 | 2.0.1 | Gera o adapter do Hive para o model |
 
+Fora da lista do enunciado, o projeto tem o `material_ui` (1.1.0), que já vem no projeto criado pelo Flutter 3.50: os componentes Material passaram para esse pacote, e o antigo `package:flutter/material.dart` está obsoleto desde o Flutter 3.47.
+
 ### O que não ficou como o enunciado pede, e por quê
 
 - **map_launcher: ^3.0.0 no lugar de ^2.2.1+1.** A série 2.x registra o plugin com `PluginRegistry.Registrar`, uma API do Flutter antigo que foi removida. O build falha na compilação do próprio código da biblioteca, e nenhuma configuração do projeto contorna isso. A série 3.x é a menor que compila. Testei: o build passa e o app abre no emulador.
-- **Bloco de compatibilidade no `android/build.gradle.kts`.** O `geocoding` 2.x e o `map_launcher` 3.x foram feitos para um Android Gradle Plugin antigo: não declaram `namespace` (obrigatório a partir do AGP 8), compilam contra o Android 33 (dependências AndroidX atuais exigem 34 ou mais) e geram Java e Kotlin para versões diferentes da JVM. O bloco completa esses três pontos só para as bibliotecas, sem mudar a versão delas. Assim o `geocoding` continua na versão do enunciado.
+- **Bloco de compatibilidade no `android/build.gradle.kts`.** O `geocoding` 2.x e o `map_launcher` 3.x foram feitos para um Android antigo. Eles compilam contra o Android 33, mas dependências AndroidX atuais exigem 34 ou mais. Além disso, geram Java 1.8 enquanto o Kotlin gera para a JVM atual, e o Gradle recusa essa combinação. O bloco sobe o `compileSdk` para 36 nas bibliotecas que estiverem abaixo disso, sem rebaixar nenhuma, e coloca Java e Kotlin na versão 17 só nessas duas bibliotecas. Nenhuma versão de biblioteca muda, e assim o `geocoding` continua na versão do enunciado.
 - **path_provider_ios está descontinuado** (o substituto é o `path_provider_foundation`, que o `path_provider` já usa por dentro). Mantive porque o enunciado pede e ele não quebra o build.
 - **Alerta de segurança no dio 4.0.6** ([GHSA-9324-jv53-9cc8](https://github.com/advisories/GHSA-9324-jv53-9cc8)): injeção de CRLF quando quem ataca controla o nome do método HTTP. A correção só existe no dio 5, fora do `^4.0.6`. No FastLocation o método é sempre `GET`, fixo no código, então esse ataque não se aplica. Mantive a versão do enunciado e aceitei o risco.
