@@ -71,19 +71,22 @@ class AddressModel {
   String get cityState => '$localidade - $uf';
 
   /// Texto completo usado para achar as coordenadas da rota.
-  String get fullAddress =>
-      [logradouro, bairro, localidade, uf, 'Brasil']
-          .where((part) => part.isNotEmpty)
-          .join(', ');
+  String get fullAddress => [
+    logradouro,
+    bairro,
+    localidade,
+    uf,
+    'Brasil',
+  ].where((part) => part.isNotEmpty).join(', ');
 
   /// Mesma consulta com outro horário (quando o CEP é consultado de novo).
   AddressModel copyWithConsultedAt(DateTime at) => AddressModel(
-        cep: cep,
-        logradouro: logradouro,
-        complemento: complemento,
-        bairro: bairro,
-        localidade: localidade,
-        uf: uf,
-        consultedAt: at,
-      );
+    cep: cep,
+    logradouro: logradouro,
+    complemento: complemento,
+    bairro: bairro,
+    localidade: localidade,
+    uf: uf,
+    consultedAt: at,
+  );
 }

@@ -37,7 +37,9 @@ class LastAddressCard extends StatelessWidget {
             ),
             const SizedBox(height: AppMetrics.spaceSm),
             Text(
-              address.street.isEmpty ? 'Logradouro não informado' : address.street,
+              address.street.isEmpty
+                  ? 'Logradouro não informado'
+                  : address.street,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -50,7 +52,10 @@ class LastAddressCard extends StatelessWidget {
                 style: const TextStyle(color: AppColors.textSecondary),
               ),
             const SizedBox(height: AppMetrics.spaceXs),
-            Text(address.cityState, style: const TextStyle(color: AppColors.text)),
+            Text(
+              address.cityState,
+              style: const TextStyle(color: AppColors.text),
+            ),
             Text(
               'CEP ${address.cep}',
               style: const TextStyle(color: AppColors.textSecondary),

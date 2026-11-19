@@ -25,7 +25,11 @@ class AppMessage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: AppMetrics.iconLarge, color: AppColors.textSecondary),
+            Icon(
+              icon,
+              size: AppMetrics.iconLarge,
+              color: AppColors.textSecondary,
+            ),
             const SizedBox(height: AppMetrics.spaceMd),
             Text(
               title,

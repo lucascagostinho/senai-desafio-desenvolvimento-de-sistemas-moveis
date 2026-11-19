@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_ui/material_ui.dart' show debugPrint;
 import 'package:path/path.dart' as p;
@@ -29,14 +27,9 @@ abstract final class HiveConfig {
   /// O `path_provider` devolve a pasta interna do app (Application Support:
   /// privada, invisível ao usuário e fora do backup do iCloud no iOS) e o
   /// `path` monta o caminho da subpasta.
-  ///
-  /// [directory] existe para os testes trocarem a pasta do aparelho por uma
-  /// pasta temporária ou simularem uma falha.
-  static Future<bool> init({
-    Future<Directory> Function() directory = getApplicationSupportDirectory,
-  }) async {
+  static Future<bool> init() async {
     try {
-      final base = await directory();
+      final base = await getApplicationSupportDirectory();
       Hive.init(p.join(base.path, folder));
       _isAvailable = true;
     } catch (error) {

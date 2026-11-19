@@ -20,7 +20,8 @@ class SearchForm extends StatefulWidget {
     required String uf,
     required String city,
     required String street,
-  }) onSearchAddress;
+  })
+  onSearchAddress;
 
   /// Falso enquanto uma consulta está em andamento.
   final bool enabled;

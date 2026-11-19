@@ -12,7 +12,14 @@ Desafio 2 da disciplina Desenvolvimento de Sistemas Móveis (ADS, SENAI/SC).
 - **Busca de CEP por endereço:** informe UF, cidade e a rua (completa ou parte do nome, com pelo menos 3 letras) e escolha o endereço certo na lista. O nome precisa bater com o da ViaCEP: em Blumenau a rua está cadastrada como "Rua 15 de Novembro", então "Novembro" a encontra, mas "XV de Novembro" não.
 - **Consultas recentes e cache:** cada consulta fica guardada no aparelho (Hive). Um CEP já consultado responde na hora, mesmo sem internet.
 - **Traçar rota:** abre o Google Maps (ou outro app de mapas instalado) com a rota da sua localização até o último endereço consultado. Quem pede a permissão de localização é o app de mapas; o FastLocation não acessa o GPS.
-- **Erros explicados:** CEP com tamanho errado, endereço não encontrado e falta de internet aparecem como aviso na tela.
+- **Não encontrado e erros:** quando a ViaCEP não acha o CEP ou o endereço, a área de resultado mostra "Endereço não encontrado". CEP com tamanho errado, campos curtos demais e falta de internet aparecem num aviso na parte de baixo da tela.
+
+## Dados e privacidade
+
+- **O que fica no aparelho:** os endereços consultados (rua, bairro, cidade, CEP e a data da consulta), numa pasta interna do app. Não há login, senha nem dado do entregador.
+- **Por que não é criptografado:** são endereços de entrega, não credenciais. Criptografar exigiria guardar uma chave com outra biblioteca, fora da lista do enunciado. Aceitei o risco de quem tiver acesso aos arquivos do app ver o histórico; a proteção fica por conta do bloqueio do próprio aparelho.
+- **O que sai do aparelho:** o CEP ou o endereço digitado vai para a ViaCEP (HTTPS). Ao traçar a rota, o `geocoding` envia o endereço ao serviço de localização do sistema (no Android, o do Google) para obter as coordenadas.
+- **Se o armazenamento falhar:** o app abre e consulta normalmente, só sem histórico e sem cache.
 
 ## Como o código está organizado
 
@@ -36,7 +43,7 @@ lib/
         └── history/          histórico de consultas (passo 06)
 ```
 
-A tela só conversa com o controller; o controller usa o service; o service decide entre o armazenamento local e a API. Assim cada camada pode ser testada sozinha, com repositórios falsos no lugar da internet e do Hive.
+A tela só conversa com o controller; o controller usa o service; o service decide entre o armazenamento local e a API. Cada camada recebe as dependências pelo construtor, então dá para trocar uma parte sem mexer nas outras.
 
 Os arquivos `*.g.dart` (adapter do Hive e código do MobX) já estão no repositório. Se alterar o model ou o controller, gere de novo:
 
@@ -54,7 +61,7 @@ dart run build_runner build --delete-conflicting-outputs
 | JDK | 21 |
 | Emulador | Android 16 (API 36), imagem **Google Play** x86_64 |
 
-Uso o emulador com a imagem **Google Play** porque a ação de traçar rota vai precisar do `geocoding` (que no Android depende dos serviços do Google) e de um app de mapas instalado. Isso será confirmado quando a rota for implementada.
+Uso o emulador com a imagem **Google Play** porque a ação de traçar rota precisa do `geocoding` (que no Android usa o serviço de localização do Google) e de um app de mapas instalado. Testei no emulador: o Google Maps abre com a rota da posição atual até o endereço.
 
 Só o Android foi testado. A pasta `ios/` faz parte do projeto, como o enunciado pede, mas compilar para iOS exige macOS e Xcode.
 
@@ -86,13 +93,6 @@ cd senai-desafio-desenvolvimento-de-sistemas-moveis
 flutter pub get
 flutter devices   # o emulador precisa aparecer na lista
 flutter run
-```
-
-### 3. Testes e análise
-
-```bash
-flutter test
-flutter analyze
 ```
 
 ### Observação sobre o build no Windows
