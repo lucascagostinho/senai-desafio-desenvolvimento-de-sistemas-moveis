@@ -44,7 +44,7 @@ lib/
             └── page/         HistoryPage (Observer, carrega ao abrir)
 ```
 
-A tela só conversa com o controller; o controller usa o service; o service decide entre o armazenamento local e a API. Cada camada recebe as dependências pelo construtor, então dá para trocar uma parte sem mexer nas outras.
+Na home, a tela só conversa com o controller; o controller usa o service; o service aplica as regras (validação, cache, histórico) e decide entre o armazenamento local e a API. O histórico não tem regra de negócio: o controller dele lê direto o repositório local, como o passo 06 do enunciado descreve. Cada camada recebe as dependências pelo construtor, então dá para trocar uma parte sem mexer nas outras.
 
 Os arquivos `*.g.dart` (adapter do Hive e código do MobX) já estão no repositório. Se alterar o model ou o controller, gere de novo:
 
