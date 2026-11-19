@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Acesso à internet para consultar a API ViaCEP. Sem esta linha, só o
+         build de debug acessa a rede (o Flutter a coloca no manifest de debug). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
-        android:label="fastlocation"
+        android:label="FastLocation"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
