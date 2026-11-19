@@ -14,6 +14,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Armazenamento local: precisa estar pronto antes da home ler o histórico.
+  // Se falhar, o app abre mesmo assim (HiveConfig.isAvailable fica false).
   await HiveConfig.init();
 
   runApp(const AppWidget());
