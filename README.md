@@ -4,13 +4,12 @@ Aplicativo Flutter para os entregadores da FastDelivery consultarem o endereço 
 
 Desafio 2 da disciplina Desenvolvimento de Sistemas Móveis (ADS, SENAI/SC).
 
-> Em desenvolvimento. Já estão prontos os passos 01 a 05 do enunciado (projeto, bibliotecas, estruturas compartilhadas, tela de abertura e módulo Home). Falta o módulo de histórico (passo 06).
-
 ## O que o app faz
 
 - **Consulta por CEP:** digite o CEP (com ou sem hífen) e veja rua, bairro, cidade e estado.
 - **Busca de CEP por endereço:** informe UF, cidade e a rua (completa ou parte do nome, com pelo menos 3 letras) e escolha o endereço certo na lista. O nome precisa bater com o da ViaCEP: em Blumenau a rua está cadastrada como "Rua 15 de Novembro", então "Novembro" a encontra, mas "XV de Novembro" não.
-- **Consultas recentes e cache:** cada consulta fica guardada no aparelho (Hive). Um CEP já consultado responde na hora, mesmo sem internet.
+- **Consultas recentes e cache:** cada consulta fica guardada no aparelho (Hive). A home mostra as 5 mais recentes, e um CEP já consultado responde na hora, mesmo sem internet.
+- **Histórico:** o ícone de relógio no topo da home abre todos os endereços consultados, com data e hora, do mais recente para o mais antigo. A lista carrega sozinha ao abrir a tela.
 - **Traçar rota:** abre o Google Maps (ou outro app de mapas instalado) com a rota da sua localização até o último endereço consultado. Quem pede a permissão de localização é o app de mapas; o FastLocation não acessa o GPS.
 - **Não encontrado e erros:** quando a ViaCEP não acha o CEP ou o endereço, a área de resultado mostra "Endereço não encontrado". CEP com tamanho errado, campos curtos demais e falta de internet aparecem num aviso na parte de baixo da tela.
 
@@ -40,7 +39,9 @@ lib/
         │   ├── controller/   HomeController (MobX)
         │   ├── components/   formulário, cartão do endereço, listas, busca vazia, não encontrado
         │   └── page/         HomePage (Observer + reaction para erros)
-        └── history/          histórico de consultas (passo 06)
+        └── history/
+            ├── controller/   HistoryController (MobX): lê o histórico do Hive
+            └── page/         HistoryPage (Observer, carrega ao abrir)
 ```
 
 A tela só conversa com o controller; o controller usa o service; o service decide entre o armazenamento local e a API. Cada camada recebe as dependências pelo construtor, então dá para trocar uma parte sem mexer nas outras.
