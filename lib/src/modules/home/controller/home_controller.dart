@@ -68,9 +68,6 @@ abstract class HomeControllerBase with Store {
   @computed
   bool get isLoading => status == HomeStatus.loading;
 
-  @computed
-  bool get canTraceRoute => lastAddress != null && !isRouting;
-
   bool get isStorageAvailable => service.isStorageAvailable;
 
   /// Carrega as últimas consultas ao abrir a home. A mais recente vira o
@@ -97,6 +94,9 @@ abstract class HomeControllerBase with Store {
       await loadRecent();
     } on AddressException catch (error) {
       _fail(error.message);
+    } catch (_) {
+      // Erro que o service não previu: a tela não pode ficar em loading.
+      _fail(_unexpected);
     }
   }
 
@@ -109,22 +109,33 @@ abstract class HomeControllerBase with Store {
     errorMessage = null;
     status = HomeStatus.loading;
     try {
-      final list =
-          await service.searchByAddress(uf: uf, city: city, street: street);
+      final list = await service.searchByAddress(
+        uf: uf,
+        city: city,
+        street: street,
+      );
       results = ObservableList.of(list);
       status = list.isEmpty ? HomeStatus.notFound : HomeStatus.results;
     } on AddressException catch (error) {
       _fail(error.message);
+    } catch (_) {
+      // Erro que o service não previu: a tela não pode ficar em loading.
+      _fail(_unexpected);
     }
   }
 
-  /// O entregador tocou num resultado da busca por endereço.
+  /// O entregador tocou num resultado da busca ou numa consulta recente:
+  /// esse endereço vira o último consultado.
   @action
   Future<void> select(AddressModel address) async {
-    lastAddress = await service.select(address);
-    results.clear();
-    status = HomeStatus.found;
-    await loadRecent();
+    try {
+      lastAddress = await service.select(address);
+      results.clear();
+      status = HomeStatus.found;
+      await loadRecent();
+    } catch (_) {
+      _fail(_unexpected);
+    }
   }
 
   /// Ação "nova consulta": limpa o resultado e volta ao estado inicial.
@@ -155,7 +166,10 @@ abstract class HomeControllerBase with Store {
   @action
   void clearError() => errorMessage = null;
 
-  // Erro numa consulta: volta ao estado anterior e avisa.
+  static const _unexpected = 'Algo deu errado. Tente de novo.';
+
+  // Erro numa consulta: tira o loading, volta a mostrar o último endereço
+  // (ou a busca vazia, se ainda não houver nenhum) e avisa o entregador.
   void _fail(String message) {
     status = lastAddress == null ? HomeStatus.initial : HomeStatus.found;
     errorMessage = message;

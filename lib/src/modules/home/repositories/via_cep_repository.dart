@@ -33,7 +33,8 @@ class ViaCepRepository {
     required String street,
   }) async {
     // Cidade e rua podem ter espaços e acentos: são codificadas na URL.
-    final path = '${Uri.encodeComponent(uf)}/'
+    final path =
+        '${Uri.encodeComponent(uf)}/'
         '${Uri.encodeComponent(city)}/'
         '${Uri.encodeComponent(street)}/json/';
     final response = await _dio.get<List<dynamic>>(path);

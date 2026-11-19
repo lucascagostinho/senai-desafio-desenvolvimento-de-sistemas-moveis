@@ -18,8 +18,9 @@ class AddressLocalRepository {
     if (!isAvailable) return null;
     if (_box != null && _box!.isOpen) return _box;
     // O adapter gerado precisa ser registrado uma vez antes de abrir a box.
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(AddressModelAdapter());
+    final adapter = AddressModelAdapter();
+    if (!Hive.isAdapterRegistered(adapter.typeId)) {
+      Hive.registerAdapter(adapter);
     }
     _box = await Hive.openBox<AddressModel>(HiveConfig.addressBox);
     return _box;

@@ -19,9 +19,7 @@ class RouteService {
     try {
       final locations = await locationFromAddress(address.fullAddress);
       if (locations.isEmpty) {
-        throw const AddressException(
-          'Não encontrei este endereço no mapa.',
-        );
+        throw const AddressException('Não encontrei este endereço no mapa.');
       }
       target = locations.first;
     } on AddressException {
@@ -33,7 +31,12 @@ class RouteService {
       );
     }
 
-    final maps = await MapLauncher.installedMaps;
+    final List<AvailableMap> maps;
+    try {
+      maps = await MapLauncher.installedMaps;
+    } catch (_) {
+      throw const AddressException('Não foi possível abrir o app de mapas.');
+    }
     if (maps.isEmpty) {
       throw const AddressException('Nenhum app de mapas instalado.');
     }
@@ -42,9 +45,13 @@ class RouteService {
       orElse: () => maps.first,
     );
 
-    await map.showDirections(
-      destination: Coords(target.latitude, target.longitude),
-      destinationTitle: address.street.isEmpty ? address.cep : address.street,
-    );
+    try {
+      await map.showDirections(
+        destination: Coords(target.latitude, target.longitude),
+        destinationTitle: address.street.isEmpty ? address.cep : address.street,
+      );
+    } catch (_) {
+      throw const AddressException('Não foi possível abrir o app de mapas.');
+    }
   }
 }

@@ -20,10 +20,7 @@ import '../service/route_service.dart';
 
 /// Home do FastLocation: consulta de CEP e de endereço.
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, this.controller});
-
-  /// Permite aos testes entregar um controller com repositórios falsos.
-  final HomeController? controller;
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -41,31 +38,33 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     // Injeção de dependência manual: a página monta a cadeia
     // API/Hive → repositórios → service → controller.
-    _controller = widget.controller ??
-        HomeController(
-          service: AddressService(
-            api: ViaCepRepository(HttpClient.create()),
-            local: AddressLocalRepository(),
-          ),
-          routeService: RouteService(),
-        );
+    _controller = HomeController(
+      service: AddressService(
+        api: ViaCepRepository(HttpClient.create()),
+        local: AddressLocalRepository(),
+      ),
+      routeService: RouteService(),
+    );
 
     // Reação do MobX para erros: toda vez que errorMessage recebe uma
     // mensagem, mostra um aviso na parte de baixo da tela. Diferente do
     // Observer, a reaction não desenha nada: executa um efeito colateral.
-    _errorReaction = reaction<String?>(
-      (_) => _controller.errorMessage,
-      (message) {
-        if (message == null || !mounted) return;
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(
-            content: Text(message),
-            backgroundColor: AppColors.error,
-          ));
+    _errorReaction = reaction<String?>((_) => _controller.errorMessage, (
+      message,
+    ) {
+      // Só avisa se a home está na frente (não sobre a tela de histórico).
+      if (message == null || !mounted) return;
+      if (ModalRoute.of(context)?.isCurrent == false) {
         _controller.clearError();
-      },
-    );
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: AppColors.error),
+        );
+      _controller.clearError();
+    });
 
     _controller.loadRecent();
   }
@@ -103,9 +102,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      // Ação "nova consulta": aparece depois de uma consulta.
+      // Ação "nova consulta": aparece depois de uma consulta. Some durante o
+      // loading, para uma resposta atrasada não aparecer depois da limpeza.
       floatingActionButton: Observer(
-        builder: (_) => _controller.status == HomeStatus.initial
+        builder: (_) =>
+            _controller.status == HomeStatus.initial || _controller.isLoading
             ? const SizedBox.shrink()
             : FloatingActionButton.extended(
                 key: const Key('newSearchButton'),
@@ -153,7 +154,9 @@ class _HomePageState extends State<HomePage> {
               return AddressList(
                 title: 'Consultas recentes',
                 addresses: _controller.recent.toList(),
-                onTap: _controller.select,
+                // Sem toque durante o loading (a resposta em andamento
+                // sobrescreveria o endereço escolhido).
+                onTap: _controller.isLoading ? null : _controller.select,
               );
             },
           ),
