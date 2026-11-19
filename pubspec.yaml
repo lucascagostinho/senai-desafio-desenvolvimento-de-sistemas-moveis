@@ -16,7 +16,10 @@ dependencies:
   # Dependências do app (passo 02 do enunciado, nas versões indicadas).
   # Exceção: map_launcher (o enunciado pede ^2.2.1+1). A série 2.x usa a API
   # PluginRegistry.Registrar, removida do Flutter, e não compila mais. Usamos
-  # a menor série que compila (3.x). Detalhes no README.
+  # a menor série que compila (3.x).
+  # path_provider_android: a faixa do enunciado (^2.0.14) foi estreitada para
+  # abaixo da 2.3.0, porque a 2.3.1 trava o app ao buscar a pasta do Hive.
+  # Detalhes no README.
   dio: ^4.0.6
   flutter_mobx: ^2.0.4
   mobx: ^2.0.6+1
@@ -24,7 +27,7 @@ dependencies:
   hive_flutter: ^1.1.0
   path: ^1.8.0
   path_provider: ^2.0.2
-  path_provider_android: ^2.0.14
+  path_provider_android: '>=2.0.14 <2.3.0'
   path_provider_ios: ^2.0.9
   map_launcher: ^3.0.0
   geocoding: ^2.1.1
