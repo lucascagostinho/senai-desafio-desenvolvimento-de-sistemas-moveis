@@ -1,20 +1,29 @@
 import 'package:material_ui/material_ui.dart';
 
-/// Widget raiz do aplicativo: título, tema e navegação.
-///
-/// Por enquanto mostra uma tela provisória; a tela de abertura, a home e o
-/// histórico entram nas próximas etapas, registradas como rotas nomeadas.
+import 'modules/home/page/home_page.dart';
+import 'modules/initial/page/initial_page.dart';
+import 'routes/app_routes.dart';
+import 'shared/colors/app_colors.dart';
+
+/// Widget raiz do aplicativo: título, tema e o mapa de rotas nomeadas.
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'FastLocation',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(child: Text('FastLocation')),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+        scaffoldBackgroundColor: AppColors.background,
       ),
+      initialRoute: AppRoutes.initial,
+      routes: {
+        AppRoutes.initial: (_) => const InitialPage(),
+        AppRoutes.home: (_) => const HomePage(),
+        // AppRoutes.history entra na Etapa 5 (passo 06).
+      },
     );
   }
 }

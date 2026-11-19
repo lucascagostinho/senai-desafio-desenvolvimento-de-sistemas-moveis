@@ -4,7 +4,7 @@ Aplicativo Flutter para os entregadores da FastDelivery consultarem o endereço 
 
 Desafio 2 da disciplina Desenvolvimento de Sistemas Móveis (ADS, SENAI/SC).
 
-> Em desenvolvimento. Já estão prontos os passos 01 (projeto) e 02 (bibliotecas) do enunciado.
+> Em desenvolvimento. Já estão prontos os passos 01 (projeto), 02 (bibliotecas), 03 (estruturas compartilhadas) e 04 (tela de abertura) do enunciado.
 
 ## Requisitos
 
@@ -74,7 +74,7 @@ O enunciado (passo 02) indica as bibliotecas e as versões mínimas. O `^` aceit
 | hive_flutter | ^1.1.0 | 1.1.0 | Inicialização do Hive no Flutter |
 | path | ^1.8.0 | 1.9.1 | Montagem de caminhos de arquivos |
 | path_provider | ^2.0.2 | 2.1.6 | Pasta do app no aparelho, onde o Hive grava |
-| path_provider_android | ^2.0.14 | 2.3.1 | Implementação Android do path_provider |
+| **path_provider_android** | **^2.0.14** | **2.2.23** | Implementação Android do path_provider |
 | path_provider_ios | ^2.0.9 | 2.0.11 | Implementação iOS do path_provider |
 | **map_launcher** | **^2.2.1+1** | **3.5.0** | Abre o app de mapas com a rota (ver abaixo) |
 | geocoding | ^2.1.1 | 2.2.2 | Converte o endereço em latitude e longitude para a rota |
@@ -88,5 +88,6 @@ Fora da lista do enunciado, o projeto tem o `material_ui` (1.1.0), que já vem n
 
 - **map_launcher: ^3.0.0 no lugar de ^2.2.1+1.** A série 2.x registra o plugin com `PluginRegistry.Registrar`, uma API do Flutter antigo que foi removida. O build falha na compilação do próprio código da biblioteca, e nenhuma configuração do projeto contorna isso. A série 3.x é a menor que compila. Testei: o build passa e o app abre no emulador.
 - **Bloco de compatibilidade no `android/build.gradle.kts`.** O `geocoding` 2.x e o `map_launcher` 3.x foram feitos para um Android antigo. Eles compilam contra o Android 33, mas dependências AndroidX atuais exigem 34 ou mais. Além disso, geram Java 1.8 enquanto o Kotlin gera para a JVM atual, e o Gradle recusa essa combinação. O bloco sobe o `compileSdk` para 36 nas bibliotecas que estiverem abaixo disso, sem rebaixar nenhuma, e coloca Java e Kotlin na versão 17 só nessas duas bibliotecas. Nenhuma versão de biblioteca muda, e assim o `geocoding` continua na versão do enunciado.
+- **path_provider_android limitado a `>=2.0.14 <2.3.0`.** Com o `^2.0.14` do enunciado, o pub instalou a 2.3.1, que troca a forma de falar com o Android (passa a usar o pacote `jni`). Nessa versão o app trava na abertura: ao pedir a pasta de documentos para o Hive, dá `ClassNotFoundException` para `android.content.Context`. A 2.2.23, que também está dentro da faixa do enunciado, funciona. Não troquei a biblioteca: só impedi a 2.3.x.
 - **path_provider_ios está descontinuado** (o substituto é o `path_provider_foundation`, que o `path_provider` já usa por dentro). Mantive porque o enunciado pede e ele não quebra o build.
 - **Alerta de segurança no dio 4.0.6** ([GHSA-9324-jv53-9cc8](https://github.com/advisories/GHSA-9324-jv53-9cc8)): injeção de CRLF quando quem ataca controla o nome do método HTTP. A correção só existe no dio 5, fora do `^4.0.6`. No FastLocation o método é sempre `GET`, fixo no código, então esse ataque não se aplica. Mantive a versão do enunciado e aceitei o risco.
