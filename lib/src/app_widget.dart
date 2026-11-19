@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import 'modules/history/page/history_page.dart';
 import 'modules/home/page/home_page.dart';
 import 'modules/initial/page/initial_page.dart';
 import 'routes/app_routes.dart';
@@ -22,7 +23,7 @@ class AppWidget extends StatelessWidget {
       routes: {
         AppRoutes.initial: (_) => const InitialPage(),
         AppRoutes.home: (_) => const HomePage(),
-        // AppRoutes.history entra na Etapa 5 (passo 06).
+        AppRoutes.history: (_) => const HistoryPage(),
       },
     );
   }

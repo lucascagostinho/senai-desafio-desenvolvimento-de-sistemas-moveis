@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:fastlocation/src/modules/home/model/address_model.dart';
 import 'package:fastlocation/src/modules/home/repositories/address_local_repository.dart';
 import 'package:fastlocation/src/modules/home/repositories/via_cep_repository.dart';
+import 'package:fastlocation/src/modules/home/service/address_service.dart';
+import 'package:fastlocation/src/modules/home/service/route_service.dart';
 
 /// Endereço de exemplo (CEP real da Praça da Sé, em São Paulo).
 AddressModel sampleAddress({
@@ -79,3 +81,15 @@ DioError networkError() => DioError(
       requestOptions: RequestOptions(path: ''),
       type: DioErrorType.other,
     );
+
+/// Rota falsa: registra o pedido em vez de abrir o app de mapas.
+class FakeRouteService implements RouteService {
+  AddressModel? opened;
+  AddressException? error;
+
+  @override
+  Future<void> openRoute(AddressModel address) async {
+    if (error != null) throw error!;
+    opened = address;
+  }
+}

@@ -1,23 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:fastlocation/src/modules/home/controller/home_controller.dart';
-import 'package:fastlocation/src/modules/home/model/address_model.dart';
 import 'package:fastlocation/src/modules/home/service/address_service.dart';
-import 'package:fastlocation/src/modules/home/service/route_service.dart';
 
 import 'fakes.dart';
-
-/// Rota falsa: registra o pedido em vez de abrir o app de mapas.
-class FakeRouteService implements RouteService {
-  AddressModel? opened;
-  AddressException? error;
-
-  @override
-  Future<void> openRoute(AddressModel address) async {
-    if (error != null) throw error!;
-    opened = address;
-  }
-}
 
 void main() {
   late FakeViaCepRepository api;
