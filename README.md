@@ -9,7 +9,7 @@ Desafio 2 da disciplina Desenvolvimento de Sistemas Móveis (ADS, SENAI/SC).
 ## O que o app faz
 
 - **Consulta por CEP:** digite o CEP (com ou sem hífen) e veja rua, bairro, cidade e estado.
-- **Busca de CEP por endereço:** informe UF, cidade e a rua (completa ou parte do nome, com pelo menos 3 letras) e escolha o endereço certo na lista. A ViaCEP grava números por extenso em algarismos: "Rua 15 de Novembro" é encontrada por "15 de Novembro" ou "Novembro", mas não por "XV de Novembro".
+- **Busca de CEP por endereço:** informe UF, cidade e a rua (completa ou parte do nome, com pelo menos 3 letras) e escolha o endereço certo na lista. O nome precisa bater com o da ViaCEP: em Blumenau a rua está cadastrada como "Rua 15 de Novembro", então "Novembro" a encontra, mas "XV de Novembro" não.
 - **Consultas recentes e cache:** cada consulta fica guardada no aparelho (Hive). Um CEP já consultado responde na hora, mesmo sem internet.
 - **Traçar rota:** abre o Google Maps (ou outro app de mapas instalado) com a rota da sua localização até o último endereço consultado. Quem pede a permissão de localização é o app de mapas; o FastLocation não acessa o GPS.
 - **Erros explicados:** CEP com tamanho errado, endereço não encontrado e falta de internet aparecem como aviso na tela.
